@@ -10,7 +10,7 @@ RUN yum install -y wget \
 	&& yum clean all && yum makecache
 
 # 安装需要的软件包
-RUN yum install -y passwd openssl openssh-server zip unzip python-setuptools
+RUN yum install -y passwd openssl openssh-server zip unzip python-setuptools expect
 # 安装supervisor
 RUN easy_install supervisor
 
@@ -101,9 +101,6 @@ RUN echo "ORACLE_BASE=/opt/oracle" >> ~/.bash_profile && \
 # 在oracle账户添加启动建库交互脚本(不能和上面的脚本一起添加，否则source的时候会因为这个循环报错)
 RUN echo "#oracle账户登录的时候启动建库的交互脚本" >> ~/.bash_profile && \
     echo "./OracleShell.sh" >> ~/.bash_profile
-
-#拷贝启动建库用的自动交互脚本到oracle用户目录
-COPY config/OracleShell.sh ~
 
 #拷贝oracle静默安装配置文件到容器
 COPY config/rsp /opt/config/rsp
