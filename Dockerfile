@@ -59,11 +59,11 @@ RUN yum -y install binutils compat-libstdc++-33 compat-libstdc++-33.i686 \
 COPY package/linux.x64_11gR2_database.zip /opt/linux.x64_11gR2_database.zip
 RUN unzip /opt/linux.x64_11gR2_database.zip -d /opt/ && \
     rm -f /opt/linux.x64_11gR2_database.zip && \
-    chown -R oracle:dba /opt/linux.x64_11gR2_database -f && \
-    chmod 777 /opt/linux.x64_11gR2_database/runInstaller -f && \
-    chmod 777 /opt/linux.x64_11gR2_database/install/*.sh -f && \
-    chmod 777 /opt/linux.x64_11gR2_database/install/unzip -f && \
-    chmod 777 /opt/linux.x64_11gR2_database/install/.oui -f
+    chown -f -R oracle:dba /opt/linux.x64_11gR2_database && \
+    chmod -f 777 /opt/linux.x64_11gR2_database/runInstaller && \
+    chmod -f 777 /opt/linux.x64_11gR2_database/install/*.sh && \
+    chmod -f 777 /opt/linux.x64_11gR2_database/install/unzip && \
+    chmod -f 777 /opt/linux.x64_11gR2_database/install/.oui
 
 # root账户下修改配置文件
 RUN echo "oracle soft nproc 2047" >> /etc/security/limits.conf && \
