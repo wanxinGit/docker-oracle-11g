@@ -5,7 +5,19 @@
 docker run -idt -p 2222:22 -p 1522:1521 \
  -v /opt/docker/storage/oracle/oradata:/opt/oracle/oradata \
  -v /opt/docker/storage/oracle/flash_recovery_area:/opt/oracle/flash_recovery_area \
- wanxin/oracle:v1
+ -v /etc/localtime:/etc/localtime:ro \
+ -e TZ="Asia/Shanghai" \
+ -e ALL_PASS_RANDOM=false \
+ -e SSH_ROOT_PASS=123456 \
+ -e SSH_ORACLE_PASS=123456 \
+ -e ORACLE_SYS_PASS=adminroot \
+ -e ORACLE_SYSTEM_PASS=adminroot \
+ wanxin/docker-oracle-11g
+
+其中参数：
+1、ALL_PASS_RANDOM配置为true表示全部密码随机生成（默认为false，配置打开将覆盖参数指定的密码）
+2、SSH_ROOT_PASS、SSH_ORACLE_PASS分别为root和oracle两个账户的ssh密码
+3、ORACLE_SYS_PASS、ORACLE_SYSTEM_PASS分别为oracle两个管理员的密码
 
 默认账号密码相关：
 root/123456
@@ -31,3 +43,10 @@ FAQ：
 --后续待完善的地方：
 1、docker日志部分，要给出一些提示，告知用户如何使用镜像
 2、涉及密码部分，目前都是写死的简单密码，后续最好通过随机密码，然后日志的形式告知用户
+
+--20171116
+1、完成日志提示及ssh随机密码生成
+
+--后续待完善的地方：
+1、完成oracle账户的随机(手动设置)密码生成（应该是通过修改rsp文件实现）
+2、完成oracle的一些编码之类参数的可通过启动参数配置

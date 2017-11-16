@@ -18,9 +18,16 @@ RUN easy_install supervisor
 RUN mkdir -p /var/log/supervisor
 COPY config/supervisord.conf /etc/supervisord.conf
 
+# 配置相关环境变量
+ENV ALL_PASS_RANDOM false
+ENV SSH_ROOT_PASS 123456
+ENV SSH_ORACLE_PASS 123456
+ENV ORACLE_SYS_PASS adminroot
+ENV ORACLE_SYSTEM_PASS adminroot
+
 # 配置允许root用户ssh登录
 RUN mkdir -p /var/run/sshd
-RUN echo "root:123456" | chpasswd
+# RUN echo "root:123456" | chpasswd
 RUN ssh-keygen -q -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key -N ''
 RUN ssh-keygen -q -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ''
 RUN ssh-keygen -t dsa -f /etc/ssh/ssh_host_ed25519_key  -N ''
@@ -37,7 +44,8 @@ EXPOSE 22 8080 1521
 # 修改hostname和host文件，暂时先不管试一下后续启动监听会不会有问题
 
 #  创建oracle用户组
-RUN groupadd oinstall && groupadd dba && useradd -m -g oinstall -G dba oracle && echo "oracle:123456" | chpasswd
+RUN groupadd oinstall && groupadd dba && useradd -m -g oinstall -G dba oracle
+# && echo "oracle:123456" | chpasswd
 
 # 创建Oracle安装文件夹以及数据存放文件夹
 RUN mkdir /opt/oracle/102 -p && chown -R oracle:dba /opt/oracle
