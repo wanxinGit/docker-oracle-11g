@@ -10,16 +10,19 @@ fi
 
 # 安装oracle数据库
 function install_oracle(){
-	/opt/linux.x64_11gR2_database/runInstaller -ignoreSysPrereqs -ignorePrereq -silent -responseFile /opt/config/rsp/db_install.rsp
+	/opt/linux.x64_11gR2_database/runInstaller -ignoreSysPrereqs -ignorePrereq -silent -responseFile /opt/oracle/rsp/db_install.rsp
 }
 
 # 安装oracle之后用root权限执行两个脚本
 function run_sh_as_root_after_install_oracle(){
+	#从临时文件中获取root账户密码
+	rootPass=$(cat /tmp/tempPass)
+
 	/usr/bin/expect <<EOF3
 	set timeout 5
 	spawn su -
 	expect "Password:"
-	send "123456\r"
+	send "${rootPass}\r"
 	expect "#"
 	send "/opt/oracle/oraInventory/orainstRoot.sh\r"
 	expect "#"
@@ -31,7 +34,7 @@ EOF3
 
 # 创建数据库监听
 function create_linsener(){
-	netca /silent /responsefile /opt/config/rsp/netca.rsp
+	netca /silent /responsefile /opt/oracle/rsp/netca.rsp
 }
 
 # 启动监听
@@ -46,7 +49,12 @@ function stop_linsener(){
 
 # 创建实例
 function create_instance(){
-	dbca -silent -responseFile /opt/config/rsp/dbca_create.rsp
+	# 1、询问是否自动生成密码
+	# 2、如果是选择否，则一次提示输入SYS和SYSTEM的密码
+	# 3、提示编码类型选择
+	dbca -silent -responseFile /opt/oracle/rsp/dbca_create.rsp
+	# 4、完成创建后将sys密码输出到dbca_delete.rsp中，以便后续删除数据库时可用
+	# 5、输出数据库账号密码信息，并提示用户牢记
 }
 
 # 启动实例
@@ -72,7 +80,7 @@ EOF2
 
 # 删除实例
 function remove_instance(){
-	dbca -silent -responseFile /opt/config/rsp/dbca_delete.rsp
+	dbca -silent -responseFile /opt/oracle/rsp/dbca_delete.rsp
 }
 
 # 恢复实例，用于删除容器重建后恢复数据库(主体流程备份原目录-建库建监听-停止监听和实例-还原原目录删除新建目录-重启实例和监听)

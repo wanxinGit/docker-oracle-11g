@@ -1,25 +1,25 @@
 [GENERAL]
 #不能更改
-RESPONSEFILE_VERSION = "11.2.0"
-OPERATION_TYPE = "createDatabase"
+RESPONSEFILE_VERSION="11.2.0"
+OPERATION_TYPE="createDatabase"
 
 [CREATEDATABASE]
 #数据库的名字
-GDBNAME = "orcl"
+GDBNAME="orcl"
 #对应的实例名字
-SID = "orcl"
+SID="orcl"
 #建库用的模板文件
-TEMPLATENAME = "General_Purpose.dbc"
+TEMPLATENAME="General_Purpose.dbc"
 #SYS管理员密码
-SYSPASSWORD = "adminroot"
+SYSPASSWORD="adminroot"
 #SYSTEM管理员密码
-SYSTEMPASSWORD = "adminroot"  
+SYSTEMPASSWORD="adminroot"  
 #数据文件存放目录 默认为 $ORACLE_BASE/oradata
-DATAFILEDESTINATION =
+DATAFILEDESTINATION=
 #恢复数据存放目录 默认为$ORACLE_BASE/flash_recovery_area
 RECOVERYAREADESTINATION=
 #字符集，重要!!! 建库后一般不能更改，所以建库前要确定清楚。
-CHARACTERSET = "ZHS16GBK"
-NATIONALCHARACTERSET= "AL16UTF16"
+CHARACTERSET="ZHS16GBK"
+NATIONALCHARACTERSET="AL16UTF16"
 #oracle内存5120MB
-TOTALMEMORY = "5120"
+TOTALMEMORY="5120"

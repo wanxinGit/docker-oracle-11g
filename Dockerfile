@@ -19,11 +19,11 @@ RUN mkdir -p /var/log/supervisor
 COPY config/supervisord.conf /etc/supervisord.conf
 
 # 配置相关环境变量
-ENV ALL_PASS_RANDOM false
+ENV SSH_PASS_RANDOM false
 ENV SSH_ROOT_PASS 123456
 ENV SSH_ORACLE_PASS 123456
-ENV ORACLE_SYS_PASS adminroot
-ENV ORACLE_SYSTEM_PASS adminroot
+# ENV ORACLE_SYS_PASS adminroot
+# ENV ORACLE_SYSTEM_PASS adminroot
 
 # 配置允许root用户ssh登录
 RUN mkdir -p /var/run/sshd
@@ -111,7 +111,7 @@ RUN echo "#oracle账户登录的时候启动建库的交互脚本" >> ~/.bash_pr
     echo "./OracleShell.sh" >> ~/.bash_profile
 
 #拷贝oracle静默安装配置文件到容器
-COPY config/rsp /opt/config/rsp
+COPY config/rsp /opt/oracle/rsp
 
 # 不切换到root用户会导致CMD启动supervisord失败
 USER root

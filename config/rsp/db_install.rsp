@@ -261,18 +261,18 @@ oracle.install.db.config.starterdb.enableSecuritySettings=true
 # starter database.
 #-------------------------------------------------------------------------------
 #设定所有数据库用户使用同一个密码，其它数据库用户就不用单独设置了。
-oracle.install.db.config.starterdb.password.ALL=
+oracle.install.db.config.starterdb.password.ALL=adminroot
 
 
 #-------------------------------------------------------------------------------
 # Specify the SYS password for the starter database.
 #-------------------------------------------------------------------------------
-oracle.install.db.config.starterdb.password.SYS=adminroot
+oracle.install.db.config.starterdb.password.SYS=
 
 #-------------------------------------------------------------------------------
 # Specify the SYSTEM password for the starter database.
 #-------------------------------------------------------------------------------
-oracle.install.db.config.starterdb.password.SYSTEM=adminroot
+oracle.install.db.config.starterdb.password.SYSTEM=
 
 #-------------------------------------------------------------------------------
 # Specify the SYSMAN password for the starter database.
