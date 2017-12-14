@@ -10,7 +10,7 @@ sshOraclePass="${SSH_ORACLE_PASS}"
 # oracleSysPass="${ORACLE_SYS_PASS}"
 # oracleSystemPass="${ORACLE_SYSTEM_PASS}"
 
-if [ "$SSH_PASS_RANDOM" ]; then
+if [ "$SSH_PASS_RANDOM" == "true" ]; then
 	sshRootPass=`mkpasswd -l 16`
 	sshOraclePass=`mkpasswd -l 16`
 	# oracleSysPass=`mkpasswd -l 16`

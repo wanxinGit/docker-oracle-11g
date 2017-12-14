@@ -7,7 +7,7 @@ docker run -idt -p 2222:22 -p 1522:1521 \
  -v /opt/docker/storage/oracle/flash_recovery_area:/opt/oracle/flash_recovery_area \
  -v /etc/localtime:/etc/localtime:ro \
  -e TZ="Asia/Shanghai" \
- -e ALL_PASS_RANDOM=false \
+ -e SSH_PASS_RANDOM=false \
  -e SSH_ROOT_PASS=123456 \
  -e SSH_ORACLE_PASS=123456 \
  wanxin/docker-oracle-11g

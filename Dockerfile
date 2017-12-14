@@ -65,8 +65,8 @@ RUN yum -y install binutils compat-libstdc++-33 compat-libstdc++-33.i686 \
 
 # 拷贝oracle安装包并解压
 COPY package /opt/package
-RUN unzip /opt/package/linux.x64_11gR2_database_1of2.zip -d /opt/ && \
-    unzip /opt/package/linux.x64_11gR2_database_2of2.zip -d /opt/ && \
+RUN unzip -o /opt/package/linux.x64_11gR2_database_1of2.zip -d /opt/ && \
+    unzip -o /opt/package/linux.x64_11gR2_database_2of2.zip -d /opt/ && \
 # rm -rf /opt/package && \
     chown -f -R oracle:dba /opt/database && \
     chmod -f 755 /opt/database/runInstaller && \
