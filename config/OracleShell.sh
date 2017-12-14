@@ -10,7 +10,7 @@ fi
 
 # 安装oracle数据库
 function install_oracle(){
-	/opt/linux.x64_11gR2_database/runInstaller -ignoreSysPrereqs -ignorePrereq -silent -responseFile /opt/oracle/rsp/db_install.rsp
+	/opt/database/runInstaller -ignoreSysPrereqs -ignorePrereq -silent -responseFile /opt/oracle/rsp/db_install.rsp
 }
 
 # 安装oracle之后用root权限执行两个脚本

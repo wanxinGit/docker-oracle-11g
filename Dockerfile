@@ -64,14 +64,15 @@ RUN yum -y install binutils compat-libstdc++-33 compat-libstdc++-33.i686 \
 	yum -y install libXp
 
 # 拷贝oracle安装包并解压
-COPY package/linux.x64_11gR2_database.zip /opt/linux.x64_11gR2_database.zip
-RUN unzip /opt/linux.x64_11gR2_database.zip -d /opt/ && \
-    rm -f /opt/linux.x64_11gR2_database.zip && \
-    chown -f -R oracle:dba /opt/linux.x64_11gR2_database && \
-    chmod -f 777 /opt/linux.x64_11gR2_database/runInstaller && \
-    chmod -f 777 /opt/linux.x64_11gR2_database/install/*.sh && \
-    chmod -f 777 /opt/linux.x64_11gR2_database/install/unzip && \
-    chmod -f 777 /opt/linux.x64_11gR2_database/install/.oui
+COPY package /opt/package
+RUN unzip /opt/package/linux.x64_11gR2_database_1of2.zip -d /opt/ && \
+    unzip /opt/package/linux.x64_11gR2_database_2of2.zip -d /opt/ && \
+# rm -rf /opt/package && \
+    chown -f -R oracle:dba /opt/database && \
+    chmod -f 755 /opt/database/runInstaller && \
+    chmod -f 755 /opt/database/install/*.sh && \
+    chmod -f 755 /opt/database/install/unzip && \
+    chmod -f 755 /opt/database/install/.oui
 
 # root账户下修改配置文件
 RUN echo "oracle soft nproc 2047" >> /etc/security/limits.conf && \
