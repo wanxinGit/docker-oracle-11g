@@ -142,7 +142,7 @@ function recover_instance(){
 while(true)
 do
 	echo -e "请输入指令：\n \t1 安装数据库(不要重复执行) \n \t2 执行orainstRoot.sh & root.sh脚本(安装完成后执行,不要重复操作) \
-		\n \t3 创建监听(不要重复执行) \n \t4 启动监听 \n \t5 停止监听 \n \t6 创建数据库实例 \
+		\n \t3 创建监听(不要重复执行) \n \t4 启动监听(创建后会默认启动，不需要重复操作) \n \t5 停止监听 \n \t6 创建数据库实例 \
 		\n \t7 启动数据库实例(创建后会默认启动，不需要重复操作) \n \t8 停止数据库实例 \
 		\n \t9 删除orcl数据库实例 \n \t10 恢复orcl实例(用于删除重建容器后恢复数据库) \n 退出操作请输入q"
 	read -p "Enter a number：" operationType

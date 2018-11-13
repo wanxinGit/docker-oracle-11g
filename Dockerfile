@@ -10,7 +10,7 @@ RUN yum install -y wget \
 	&& yum clean all && yum makecache
 
 # 安装需要的软件包
-RUN yum install -y passwd openssl openssh-server zip unzip python-setuptools expect
+RUN yum install -y passwd openssl openssh-server zip unzip python-setuptools expect dos2unix
 # 安装supervisor
 RUN easy_install supervisor
 
@@ -53,7 +53,7 @@ RUN mkdir /opt/oracle/102 -p && chown -R oracle:dba /opt/oracle
 #拷贝启动建库用的自动交互脚本到oracle用户目录
 COPY config/OracleShell.sh /home/oracle/OracleShell.sh
 COPY config/RootShell.sh /root/RootShell.sh
-RUN chmod 777 /home/oracle/OracleShell.sh && chmod 777 /root/RootShell.sh
+RUN chmod 777 /home/oracle/OracleShell.sh && chmod 777 /root/RootShell.sh & dos2unix /home/oracle/OracleShell.sh & dos2unix /root/RootShell.sh
 
 # 安装依赖包
 RUN yum -y install binutils compat-libstdc++-33 compat-libstdc++-33.i686 \
