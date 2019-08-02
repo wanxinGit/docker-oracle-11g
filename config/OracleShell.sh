@@ -1,20 +1,48 @@
-# 登录oracle账户时启动交互式的建库脚本
+#!/bin/bash
+
+# 此脚本包含oracle的常用路径和方法，供其他脚本引用，本身不需要执行权限
 
 # 检查是否存在旧的数据库数据，并提示用户是选择新建后者恢复实例操作
 oradataPath="/opt/oracle/oradata/orcl"
 flashRecoveryAreaPath1="/opt/oracle/flash_recovery_area/orcl"
 flashRecoveryAreaPath2="/opt/oracle/flash_recovery_area/ORCL"
-if [ -d "$oradataPath" ] && [ -d "$flashRecoveryAreaPath1" ] && [ -d "$flashRecoveryAreaPath2" ]; then
-	echo "检测到存在数据文件，建议10恢复数据库实例，如果选择5创建数据库实例将清除旧数据！"
-fi
+# 创建数据库命名空间和用户的配置文件
+dbInitFile="/opt/oracle/init_data/init.ini"
+# 最新的数据库dmp文件目录
+dmpPath="/opt/oracle/init_data/last_dmp"
+
+# 以下为数据库安装各个阶段的标识，对应会存放到各个文件中，防止安装步骤错乱和冲突
+flag_base_path="/home/oracle/"
+installing_flag=$flag_base_path"flag_installing"
+installed_flag=$flag_base_path"flag_installed"
+root_shell_ran_flag=$flag_base_path"flag_root_shell_ran"
+linsener_created_flag=$flag_base_path"flag_linsener_created"
+instance_created_flag=$flag_base_path"flag_instance_created"
 
 # 安装oracle数据库
 function install_oracle(){
-	/opt/database/runInstaller -ignoreSysPrereqs -ignorePrereq -silent -responseFile /opt/oracle/rsp/db_install.rsp
+	if [ -f "$installing_flag" ]; then
+ 		echo "oracle安装中，请勿重复执行安装操作..."
+		return
+	fi
+	if [ -f "$installed_flag" ]; then
+ 		echo "oracle安装已完成，请勿重复安装..."
+		return
+	fi
+	touch $installing_flag
+	/opt/database/runInstaller -ignoreSysPrereqs -ignorePrereq -silent -waitforcompletion -responseFile /opt/oracle/rsp/db_install.rsp
+
+	rm -f $installing_flag
+	touch $installed_flag
 }
 
 # 安装oracle之后用root权限执行两个脚本
 function run_sh_as_root_after_install_oracle(){
+	if [ ! -f "$installed_flag" ]; then
+ 		echo "Oracle安装尚未完成，无法执行两个root权限的shell脚本"
+		return
+	fi
+	
 	#从临时文件中获取root账户密码
 	rootPass=$(cat /tmp/tempPass)
 
@@ -30,11 +58,17 @@ function run_sh_as_root_after_install_oracle(){
 	expect eof
 EOF3
 	echo -e "orainstRoot.sh & root.sh has runned!\n next step you can create linsener and instance."
+	touch $root_shell_ran_flag
 }
 
 # 创建数据库监听
 function create_linsener(){
+	if [ ! -f "$root_shell_ran_flag" ]; then
+ 		echo "两个root权限的shell脚本尚未执行，无法创建和启动监听"
+		return
+	fi
 	netca /silent /responsefile /opt/oracle/rsp/netca.rsp
+	touch $linsener_created_flag
 }
 
 # 启动监听
@@ -49,12 +83,19 @@ function stop_linsener(){
 
 # 创建实例
 function create_instance(){
+	if [ ! -f "$linsener_created_flag" ]; then
+ 		echo "监听尚未创建，无法创建实例"
+		return
+	fi
+
 	# 1、询问是否自动生成密码
 	# 2、如果是选择否，则一次提示输入SYS和SYSTEM的密码
 	# 3、提示编码类型选择
 	dbca -silent -responseFile /opt/oracle/rsp/dbca_create.rsp
 	# 4、完成创建后将sys密码输出到dbca_delete.rsp中，以便后续删除数据库时可用
 	# 5、输出数据库账号密码信息，并提示用户牢记
+
+	touch $instance_created_flag
 }
 
 # 启动实例
@@ -65,7 +106,6 @@ function start_instance(){
 	startup
 	exit
 EOF1
-
 }
 
 # 暂停实例
@@ -139,37 +179,24 @@ function recover_instance(){
 	echo "完成数据库恢复!!"
 }
 
-while(true)
-do
-	echo -e "请输入指令：\n \t1 安装数据库(不要重复执行) \n \t2 执行orainstRoot.sh & root.sh脚本(安装完成后执行,不要重复操作) \
-		\n \t3 创建监听(不要重复执行) \n \t4 启动监听(创建后会默认启动，不需要重复操作) \n \t5 停止监听 \n \t6 创建数据库实例 \
-		\n \t7 启动数据库实例(创建后会默认启动，不需要重复操作) \n \t8 停止数据库实例 \
-		\n \t9 删除orcl数据库实例 \n \t10 恢复orcl实例(用于删除重建容器后恢复数据库) \n 退出操作请输入q"
-	read -p "Enter a number：" operationType
-	case $operationType in
-		1)  install_oracle
-    		;;
-		2)  run_sh_as_root_after_install_oracle
-    		;;
-		3)    create_linsener
-    		;;
-    		4)  start_linsener
-    		;;
-    		5)  stop_linsener
-    		;;
-    		6)  create_instance
-    		;;
-		7)  start_instance
-    		;;
-		8)  stop_instance
-    		;;
-		9)  remove_instance
-    		;;
-		10)  recover_instance
-		;;
-		"q" | "quit" | "Q" | "exit" )  break
-    		;;
-    		*)  echo "输入错误，请重新选择！"
-    		;;
-	esac
-done
+# 根据配置文件删除已经存在的用户和命名空间
+function dropExistUserAndNameSpace(){
+	echo "旧数据删除待完成..."
+}
+
+# 根据配置文件创建命名空间、用户，并导入dmp文件
+function createUserNameSpaceAndImportDmp(){
+	echo "新数据创建和导入待完成..."
+}
+
+
+# 从指定目录
+function import_from_dmp(){
+	# 根据配置文件删除已经存在的用户和命名空间
+	dropExistUserAndNameSpace
+	
+	# 根据配置文件创建命名空间、用户，并导入dmp文件
+	createUserNameSpaceAndImportDmp
+	
+	echo "完成数据库导入!!"
+}

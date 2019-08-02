@@ -5,11 +5,13 @@
 docker run -idt -p 2222:22 -p 1522:1521 \
  -v /opt/docker/storage/oracle/oradata:/opt/oracle/oradata \
  -v /opt/docker/storage/oracle/flash_recovery_area:/opt/oracle/flash_recovery_area \
+ -v /opt/docker/storage/oracle/init_data:/opt/oracle/init_data \
  -v /etc/localtime:/etc/localtime:ro \
  -e TZ="Asia/Shanghai" \
  -e SSH_PASS_RANDOM=false \
  -e SSH_ROOT_PASS=123456 \
  -e SSH_ORACLE_PASS=123456 \
+ --name oracle11g \
  wanxin/docker-oracle-11g
 
 其中参数：
@@ -43,6 +45,23 @@ FAQ：
 
 --20171116
 1、完成日志提示及ssh随机密码生成
+
+
+--20190801
+1、数据库安装、root脚本执行、监听安装、数据库实例安装等操作放到容器启动后自动执行，不再需要一步步操作。
+2、如果存在旧数据才提示用户进行交互操作，可选择恢复数据或者重新建库。
+3、登陆oracle账户后不会自动启动选择框，而是提示用户启动进程
+
+--20190730
+1、准备新增一个dmp_data挂载目录，用作放置dmp文件，用于数据导入。
+2、另外此目录下应该还有一个init.ini文件，用于配置数据库用户创建、命名空间创建，其格式如下：
+[HS_CB]
+namespace=HS_CB_DATA
+db_schema=HS_CB
+db_user=HS_CB
+db_pass=cqpgx
+db_imp_file=file/hs_cb.dmp
+
 
 --后续待完善的地方：
 1、完成oracle账户密码的生成，目前准备通过交互的方式卸载建库的脚本中（要把密码同步到删库脚本中，否则无法进行）

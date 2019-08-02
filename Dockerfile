@@ -52,8 +52,17 @@ RUN mkdir /opt/oracle/102 -p && chown -R oracle:dba /opt/oracle
 
 #拷贝启动建库用的自动交互脚本到oracle用户目录
 COPY config/OracleShell.sh /home/oracle/OracleShell.sh
-COPY config/RootShell.sh /root/RootShell.sh
-RUN chmod 777 /home/oracle/OracleShell.sh && chmod 777 /root/RootShell.sh & dos2unix /home/oracle/OracleShell.sh & dos2unix /root/RootShell.sh
+COPY config/AutoRootShell.sh /root/AutoRootShell.sh
+COPY config/AutoOracleShell.sh /home/oracle/AutoOracleShell.sh
+COPY config/LoopSelectOption.sh /home/oracle/LoopSelectOption.sh
+RUN chmod 777 /home/oracle/OracleShell.sh \
+	&& chmod 777 /root/AutoRootShell.sh \
+	&& chmod 777 /home/oracle/AutoOracleShell.sh \
+	&& chmod 777 /home/oracle/LoopSelectOption.sh \
+	&& dos2unix /home/oracle/OracleShell.sh \
+	&& dos2unix /root/AutoRootShell.sh \
+	&& dos2unix /home/oracle/AutoOracleShell.sh \
+	&& dos2unix /home/oracle/LoopSelectOption.sh
 
 # 安装依赖包
 RUN yum -y install binutils compat-libstdc++-33 compat-libstdc++-33.i686 \
@@ -95,6 +104,13 @@ RUN echo "oracle soft nproc 2047" >> /etc/security/limits.conf && \
 RUN echo "session required /lib64/security/pam_limits.so" >> /etc/pam.d/login && \
     echo "session required pam_limits.so" >> /etc/pam.d/login
 
+# 不再直接在启动脚本中加交互脚本
+RUN echo "请使用oracle账户登录进行数据库管理操作" >> /etc/motd2 && \
+    echo "登录后请使用./LoopSelectOption.sh进入数据库操作菜单" >> /etc/motd2 && \
+	mv -f /etc/motd2 /etc/motd
+	# 似乎不一定需要如下转码操作
+	#iconv -f GBK -t UTF-8 /etc/motd2 > /etc/motd
+	
 # 切换到oracle用户
 USER oracle
 
@@ -108,8 +124,9 @@ RUN echo "ORACLE_BASE=/opt/oracle" >> ~/.bash_profile && \
     source ~/.bash_profile
 
 # 在oracle账户添加启动建库交互脚本(不能和上面的脚本一起添加，否则source的时候会因为这个循环报错)
-RUN echo "#oracle账户登录的时候启动建库的交互脚本" >> ~/.bash_profile && \
-    echo "./OracleShell.sh" >> ~/.bash_profile
+#RUN echo "#oracle账户登录的时候启动建库的交互脚本" >> ~/.bash_profile && \
+#    echo "./LoopSelectOption.sh" >> ~/.bash_profile
+
 
 #拷贝oracle静默安装配置文件到容器
 COPY config/rsp /opt/oracle/rsp
